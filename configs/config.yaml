@@ -1,0 +1,8 @@
+mysql:
+  user: root
+  passwd: iot163
+  addr: 10.220.22.14:3306
+  db: mosq
+
+server:
+  addr: ":8889"

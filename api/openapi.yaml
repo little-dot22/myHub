@@ -1,0 +1,853 @@
+openapi: "3.0.0"
+info:
+  version: 2.0.0
+  title: HUB-API
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+tags:
+  - name: application management
+
+paths:
+  /app:
+    post:
+      tags:
+        - application management
+      summary: create apps
+      operationId: createApp
+      parameters:
+        - $ref: '#/components/parameters/AK'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  format: int64
+                applicationNames:
+                  type: array
+                  items:
+                    type: string
+
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            format: int64
+                          appIds:
+                            type: array
+                            items:
+                              type: string
+
+        '400':
+          description: invalid parameters
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        required:
+                          - invalidNames
+                          - conflictNames
+                        properties:
+                          invalidNames:
+                            type: array
+                            items:
+                              type: string
+                          conflictNames:
+                            type: array
+                            items:
+                              type: string
+
+        default:
+          $ref: '#/components/responses/Exception'
+
+    get:
+      tags:
+        - application management
+      summary: query app list
+      operationId: queryAppList
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required: 
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            format: int64
+                          appIds:
+                            type: array
+                            items:
+                              type: string
+        default:
+          $ref: '#/components/responses/Exception'
+
+  /app/{appId}:
+    get:
+      tags:
+        - application management
+      summary: query an app by ID
+      operationId: getApp
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AppMeta'
+
+        '400':
+          description: invalid parameters
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        required:
+                          - invalidNames
+                          - conflictNames
+                        properties:
+                          invalidNames:
+                            type: array
+                            items:
+                              type: string
+                          conflictNames:
+                            type: array
+                            items:
+                              type: string
+
+        default:
+          $ref: '#/components/responses/Exception'
+
+  /app/all:
+    post:
+      tags:
+        - application management
+      summary: query apps by name
+      operationId: queryAppsByName
+      parameters:
+        - $ref: '#/components/parameters/AK'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                appNames:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required: 
+                      - data
+                    properties:
+                      data:
+                        type: array
+                        items: 
+                          $ref: '#/components/schemas/AppMeta'
+        default:
+          $ref: '#/components/responses/Exception'
+
+  /app/delete:
+    post:
+      tags:
+        - application management
+      summary: delete apps by name
+      operationId: deleteApp
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deviceNames:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '204':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        default:
+          $ref: '#/components/responses/Exception'
+
+  /app/{appId}/api:
+    post:
+      tags:
+        - application management
+      summary: create api
+      operationId: createApi
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count: 
+                  type: integer
+                  format: int64
+                apiNames:
+                  type: array
+                  items:
+                    type: string
+
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ApiStatus'
+
+        '400':
+          description: invalid parameters
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        required:
+                          - invalidNames
+                          - conflictNames
+                        properties:
+                          invalidNames:
+                            type: array
+                            items:
+                              type: string
+                          conflictNames:
+                            type: array
+                            items:
+                              type: string
+
+        default:
+          $ref: '#/components/responses/Exception'
+
+    get:
+      tags:
+        - application management
+      summary: query api list
+      operationId: queryApiList
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required: 
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            format: int64
+                          appIds:
+                            type: array
+                            items:
+                              type: string
+        default:
+          $ref: '#/components/responses/Exception'
+
+  /app/{appId}/api/{apiId}:
+    get:
+      tags:
+        - application management
+      summary: query an api by ID
+      operationId: getAppById
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+        - $ref: '#/components/parameters/ApiId'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ApiStatus'
+
+        '400':
+          description: invalid parameters
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        required:
+                          - invalidNames
+                          - conflictNames
+                        properties:
+                          invalidNames:
+                            type: array
+                            items:
+                              type: string
+                          conflictNames:
+                            type: array
+                            items:
+                              type: string
+
+        default:
+          $ref: '#/components/responses/Exception'
+
+  /app/{appId}/api/delete:
+    post:
+      tags:
+        - application management
+      summary: delete api by name
+      operationId: deleteApiByName
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                apiNames:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '204':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        default:
+          $ref: '#/components/responses/Exception'
+
+  /app/{appId}/api/all:
+    get:
+      tags: 
+        - application management
+      summary: query api by application
+      operationId: queryApiByApplication
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required: 
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            format: int64
+                          devices:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ApiStatus'
+        default:
+          $ref: '#/components/responses/Exception'
+
+    delete:
+      tags:
+        - application management
+      summary: delete api by application
+      operationId: deleteDevicesByApplication
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+      responses:
+        '204':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        default:
+          $ref: '#/components/responses/Exception'
+
+  /app/{appId}/product:
+    post:
+      tags:
+        - application management
+      summary: create products
+      operationId: createProducts
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count: 
+                  type: integer
+                  format: int64
+                productNames:
+                  type: array
+                  items:
+                    type: string
+
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ProductStatus'
+
+        '400':
+          description: invalid parameters
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        required:
+                          - invalidNames
+                          - conflictNames
+                        properties:
+                          invalidNames:
+                            type: array
+                            items:
+                              type: string
+                          conflictNames:
+                            type: array
+                            items:
+                              type: string
+
+        default:
+          $ref: '#/components/responses/Exception'
+
+    get:
+      tags:
+        - application management
+      summary: query product list
+      operationId: queryProductList
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required: 
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            format: int64
+                          appIds:
+                            type: array
+                            items:
+                              type: string
+        default:
+          $ref: '#/components/responses/Exception'
+
+  /app/{appId}/product/{productId}:
+    get:
+      tags:
+        - application management
+      summary: query a product by ID
+      operationId: getProductById
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+        - $ref: '#/components/parameters/ProductId'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ProductStatus'
+
+        '400':
+          description: invalid parameters
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        required:
+                          - invalidNames
+                          - conflictNames
+                        properties:
+                          invalidNames:
+                            type: array
+                            items:
+                              type: string
+                          conflictNames:
+                            type: array
+                            items:
+                              type: string
+
+        default:
+          $ref: '#/components/responses/Exception'
+
+  /app/{appId}/product/delete:
+    post:
+      tags:
+        - application management
+      summary: delete products by name
+      operationId: deleteProductsByName
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                apiNames:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '204':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        default:
+          $ref: '#/components/responses/Exception'
+
+  /app/{appId}/product/all:
+    get:
+      tags: 
+        - application management
+      summary: query products by application
+      operationId: queryProductsByApplication
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    required: 
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            format: int64
+                          devices:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ProductStatus'
+        default:
+          $ref: '#/components/responses/Exception'
+
+    delete:
+      tags:
+        - application management
+      summary: delete products by application
+      operationId: deleteProductsByApplication
+      parameters:
+        - $ref: '#/components/parameters/AK'
+        - $ref: '#/components/parameters/AppId'
+      responses:
+        '204':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        default:
+          $ref: '#/components/responses/Exception'
+
+
+components:
+  schemas:
+    BaseResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int64
+        message:
+          type: string
+    AppMeta:
+      type: object
+      required:
+        - APPKey
+        - APPSecret
+        - APPName
+        - APPNotes
+      properties:  
+        APPKey:
+          type: string
+        APPSecret:
+          type: string
+        APPName:
+          type: string
+        APPNotes:
+          type: string
+    AppStatus:
+      type: object
+      required:
+        - APPKey
+        - APPSecret
+        - APPName
+        - APPNotes
+        - createAt
+      properties:  
+        APPKey:
+          type: string
+        APPSecret:
+          type: string
+        APPName:
+          type: string
+        APPNotes:
+          type: string
+        createAt:
+          type: integer
+          format: int64
+    ApiStatus:
+      type: object
+      required:
+        - method
+        - apiName
+        - apiType
+      properties:  
+        method:
+          type: string
+        apiName:
+          type: string
+        apiType:
+          type: string
+    ProductStatus:
+      type: object
+      required:
+        - name
+        - modelID
+        - deviceType
+        - deviceQuantity
+      properties:  
+        name:
+          type: string
+        modelID:
+          type: string
+        deviceType:
+          type: string
+        deviceQuantity:
+          type: string
+
+  parameters:
+    AK:
+      name: X-API-KEY
+      in: header
+      required: true
+      schema:
+        type: string
+    Offset:
+      name: offset
+      in: query
+      schema:
+        type: integer
+        format: int64
+        default: 0
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        format: int64
+        default: 100
+    AppId:
+      name: appId
+      in: path
+      description: app id
+      required: true
+      schema:
+        type: string
+    ApiId:
+      name: apiId
+      in: path
+      description: api id
+      required: true
+      schema:
+        type: string
+    ProductId:
+      name: productId
+      in: path
+      description: product id
+      required: true
+      schema:
+        type: string
+
+  responses:
+    Exception:
+      description: unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BaseResponse'
