@@ -12,44 +12,68 @@ syntax = "proto3";
 
 package openapitools.services.applicationmanagementservice;
 
+option go_package = "applicationmanagement";
+
 import "google/protobuf/empty.proto";
-import public "models/base_response.proto";
-import public "models/inline_object.proto";
-import public "models/inline_object1.proto";
-import public "models/inline_object2.proto";
-import public "models/inline_object3.proto";
-import public "models/inline_object4.proto";
+import "models/base_response.proto";
+import "models/inline_object.proto";
+import "models/inline_object2.proto";
+import "models/inline_object1.proto";
+import "models/inline_object3.proto";
+import "models/inline_object4.proto";
+
+import "api.proto";
 
 service ApplicationManagementService {
-  rpc CreateApi (CreateApiRequest) returns (BaseResponse);
+  rpc CreateApi (CreateApiRequest) returns (BaseResponse){
+    option (api.post) = "/app/:appId/api";
+  };
 
-  rpc CreateApp (CreateAppRequest) returns (BaseResponse);
+  rpc CreateApp (CreateAppRequest) returns (BaseResponse){
+    option (api.post) = "/app";
+  };
 
-  rpc DeleteApiByName (DeleteApiByNameRequest) returns (BaseResponse);
+  rpc DeleteApiByName (DeleteApiByNameRequest) returns (BaseResponse){
+    option (api.post) = "/app/{appId}/api/delete";
+  };
 
-  rpc DeleteApp (DeleteAppRequest) returns (BaseResponse);
+  rpc DeleteApp (DeleteAppRequest) returns (BaseResponse){
+    option (api.post) = "/app/delete";
+  };
 
-  rpc DeleteDevicesByApplication (DeleteDevicesByApplicationRequest) returns (BaseResponse);
+  rpc DeleteApiByApplication (DeleteApiByApplicationRequest) returns (BaseResponse){
+    option (api.post) = "/app/:appId/api/all";
+  };
 
-  rpc GetApp (GetAppRequest) returns (BaseResponse);
+  rpc GetApp (GetAppRequest) returns (BaseResponse){
+    option (api.get) = "/app";
+  };
 
-  rpc GetAppById (GetAppByIdRequest) returns (BaseResponse);
+  rpc GetAppById (GetAppByIdRequest) returns (BaseResponse){
+    option (api.get) = "/app/:appId";
+  };
 
-  rpc QueryApiByApplication (QueryApiByApplicationRequest) returns (BaseResponse);
+  rpc QueryApiByApplication (QueryApiByApplicationRequest) returns (BaseResponse){
+    option (api.get) = "/app/:appId/api/all";
+  };
 
-  rpc QueryApiList (QueryApiListRequest) returns (BaseResponse);
+  rpc QueryApiList (QueryApiListRequest) returns (BaseResponse){
+    option (api.get) = "/app/:appId/api";
+  };
 
-  rpc QueryAppList (QueryAppListRequest) returns (BaseResponse);
+  rpc QueryAppList (QueryAppListRequest) returns (BaseResponse){
+    option (api.get) = "/app";
+  };
 
   rpc QueryAppsByName (QueryAppsByNameRequest) returns (BaseResponse);
-
+    option (api.get) = "/app/all";
 }
 
 message CreateApiRequest {
-  string xAPIKEY = 1;
+  string xAPIKEY = 1[(api.header) = "X-API-KEY", (api.vd) = "(len($) > 0 && len($) <= 64)"];
   // app id
-  string appId = 2;
-  InlineObject3 inlineObject3 = 3;
+  string appId = 2[(api.path) = "productKey", (api.vd) = "(len($) > 0 && len($) <= 64)"];
+  InlineObject3 inlineObject3 = 3[(api.body) = "deviceNames", (api.vd) = "len($) <= 1000"];
 
 }
 
@@ -75,7 +99,7 @@ message DeleteAppRequest {
 
 }
 
-message DeleteDevicesByApplicationRequest {
+message DeleteApiByApplicationRequest {
   string xAPIKEY = 1;
   // app id
   string appId = 2;

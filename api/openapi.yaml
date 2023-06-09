@@ -466,7 +466,7 @@ paths:
       tags:
         - application management
       summary: delete api by application
-      operationId: deleteDevicesByApplication
+      operationId: deleteApiByApplication
       parameters:
         - $ref: '#/components/parameters/AK'
         - $ref: '#/components/parameters/AppId'
