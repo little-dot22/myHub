@@ -1,0 +1,13 @@
+.openapi-generator-ignore
+README.md
+models/api_status.proto
+models/app_meta.proto
+models/app_status.proto
+models/base_response.proto
+models/inline_object.proto
+models/inline_object1.proto
+models/inline_object2.proto
+models/inline_object3.proto
+models/inline_object4.proto
+models/product_status.proto
+services/application_management_service.proto
